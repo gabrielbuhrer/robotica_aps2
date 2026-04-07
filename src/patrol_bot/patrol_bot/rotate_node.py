@@ -76,9 +76,9 @@ class RotateNode(Node):
 
         if target_radians == 0.0:
             self.stop_robot()
-            goal_handle.succeed()
             result = RotateAngle.Result()
             result.success = True
+            goal_handle.succeed()
             return result
 
         while not self.odom_received:
@@ -113,12 +113,11 @@ class RotateNode(Node):
             time.sleep(0.05)
 
         self.stop_robot()
-        goal_handle.succeed()
+        self.get_logger().info('Rotação concluída com sucesso.')
 
         result = RotateAngle.Result()
         result.success = True
-
-        self.get_logger().info('Rotação concluída com sucesso.')
+        goal_handle.succeed()
         return result
 
 
