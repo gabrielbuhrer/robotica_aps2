@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Variáveis reutilizáveis (requisito do APS) -->
+  <xacro:property name="wheel_radius" value="0.05"/>
+  <xacro:property name="wheel_length" value="0.03"/>
+
+  <!-- Macro reutilizável da roda -->
+  <xacro:macro name="wheel_link" params="name mass">
+    <link name="${name}">
+      <visual>
+        <!-- Rotaciona o cilindro para ficar com o eixo ao longo de Y (como roda) -->
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+        </geometry>
+      </collision>
+
+      <!-- Inércia via macro do inertial_macros.xacro -->
+      <xacro:inertial_cylinder mass="${mass}" length="${wheel_length}" radius="${wheel_radius}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:inertial_cylinder>
+    </link>
+  </xacro:macro>
+
+</robot>

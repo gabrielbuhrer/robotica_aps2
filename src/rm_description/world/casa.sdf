@@ -1,0 +1,540 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="casa">
+
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!--
+    ================================================================
+    LAYOUT DA CASA (11m x 9m) - Vista superior
+    ================================================================
+
+         0       4.5  6    8.5      11
+    9    +==D====+    +====D========+
+         |  Q1   |    |     Q2      |
+         | 4.5x4 |corr|    5x3.5   |
+    5.5  |       |    +==D==+=======+
+    5    +==D====+    |Bath |       |
+         |       |    |2.5x |  Coz. |
+    4    | Sala  |    +=====+ ext.  |
+         | 4.5x5 |corr|            |
+         |       |    |  Cozinha    |
+         |       |    |  (L-shape)  |
+    0    +=======+====+=============+
+         0       4.5  6            11
+
+    Corredor: X=4.5 a 6, Y=0 a 9 (1.5m largura)
+
+    Sala:     (0, 0)   a (4.5, 5)    4.5 x 5m
+    Quarto 1: (0, 5)   a (4.5, 9)    4.5 x 4m
+    Cozinha:  (6, 0)   a (11, 4) + (8.5, 4) a (11, 5.5)  L-shape
+    Banheiro: (6, 4)   a (8.5, 5.5)  2.5 x 1.5m
+    Quarto 2: (6, 5.5) a (11, 9)     5 x 3.5m
+
+    Portas (1m): Sala Y=1.5-2.5 | Q1 Y=7-8 | Coz Y=1.5-2.5
+                 Bath Y=4.25-5.25 | Q2 Y=7-8
+    Janelas (1m): Sala X=0 | Q1 Y=9 | Q2 Y=9 | Coz X=11
+    ================================================================
+    -->
+
+    <!-- ==================== GROUND PLANE ==================== -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ==================== PISO DA CASA ==================== -->
+    <model name="floor">
+      <static>true</static>
+      <pose>5.5 4.5 0.01 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>11 9 0.02</size></box></geometry>
+          <material>
+            <ambient>0.76 0.60 0.42 1</ambient>
+            <diffuse>0.76 0.60 0.42 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================ -->
+    <!--                    PAREDES EXTERNAS                          -->
+    <!-- ============================================================ -->
+
+    <!-- PAREDE INFERIOR (Y=0) - solida -->
+    <model name="wall_ext_bottom">
+      <static>true</static>
+      <pose>5.5 0 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>11 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>11 0.15 2.5</size></box></geometry>
+          <material>
+            <ambient>0.9 0.85 0.75 1</ambient>
+            <diffuse>0.9 0.85 0.75 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- PAREDE SUPERIOR (Y=9) - janela Q1 X=1.5..2.5 | janela Q2 X=8..9 -->
+    <model name="wall_ext_top_1">
+      <static>true</static>
+      <pose>0.75 9 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.5 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.5 0.15 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_top_win1_sill">
+      <static>true</static>
+      <pose>2 9 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1 0.15 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1 0.15 0.8</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_top_win1_lintel">
+      <static>true</static>
+      <pose>2 9 2.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1 0.15 0.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1 0.15 0.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_top_2">
+      <static>true</static>
+      <pose>5.25 9 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>5.5 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>5.5 0.15 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_top_win2_sill">
+      <static>true</static>
+      <pose>8.5 9 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1 0.15 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1 0.15 0.8</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_top_win2_lintel">
+      <static>true</static>
+      <pose>8.5 9 2.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1 0.15 0.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1 0.15 0.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_top_3">
+      <static>true</static>
+      <pose>10 9 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>2 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>2 0.15 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- PAREDE ESQUERDA (X=0) - janela Sala Y=2..3 -->
+    <model name="wall_ext_left_1">
+      <static>true</static>
+      <pose>0 1 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 2 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 2 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_left_win_sill">
+      <static>true</static>
+      <pose>0 2.5 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1 0.8</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_left_win_lintel">
+      <static>true</static>
+      <pose>0 2.5 2.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1 0.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1 0.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_left_2">
+      <static>true</static>
+      <pose>0 6 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 6 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 6 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- PAREDE DIREITA (X=11) - janela Cozinha Y=1.5..2.5 -->
+    <model name="wall_ext_right_1">
+      <static>true</static>
+      <pose>11 0.75 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_right_win_sill">
+      <static>true</static>
+      <pose>11 2 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1 0.8</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_right_win_lintel">
+      <static>true</static>
+      <pose>11 2 2.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1 0.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1 0.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_ext_right_2">
+      <static>true</static>
+      <pose>11 5.75 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 6.5 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 6.5 2.5</size></box></geometry>
+          <material><ambient>0.9 0.85 0.75 1</ambient><diffuse>0.9 0.85 0.75 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================ -->
+    <!--               PAREDE CORREDOR ESQUERDA (X=4.5)               -->
+    <!--       Porta Sala: Y=1.5..2.5 | Porta Q1: Y=7..8             -->
+    <!-- ============================================================ -->
+
+    <!-- Y=0 a 1.5 (abaixo porta Sala) -->
+    <model name="wall_corr_left_1">
+      <static>true</static>
+      <pose>4.5 0.75 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Y=2.5 a 5 (entre porta Sala e divisoria Y=5) -->
+    <model name="wall_corr_left_2">
+      <static>true</static>
+      <pose>4.5 3.75 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 2.5 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 2.5 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Y=5 a 7 (entre divisoria Y=5 e porta Q1) -->
+    <model name="wall_corr_left_3">
+      <static>true</static>
+      <pose>4.5 6 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 2 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 2 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Y=8 a 9 (acima porta Q1) -->
+    <model name="wall_corr_left_4">
+      <static>true</static>
+      <pose>4.5 8.5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================ -->
+    <!--               PAREDE CORREDOR DIREITA (X=6)                  -->
+    <!--  Porta Cozinha: Y=1.5..2.5 | Porta Bath: Y=4.25..5.25       -->
+    <!--  Porta Q2: Y=7..8                                           -->
+    <!-- ============================================================ -->
+
+    <!-- Y=0 a 1.5 (abaixo porta Cozinha) -->
+    <model name="wall_corr_right_1">
+      <static>true</static>
+      <pose>6 0.75 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Y=2.5 a 4.25 (entre porta Cozinha e porta Banheiro) -->
+    <model name="wall_corr_right_2">
+      <static>true</static>
+      <pose>6 3.375 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1.75 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1.75 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Y=5.25 a 7 (entre porta Banheiro e porta Q2) -->
+    <model name="wall_corr_right_3">
+      <static>true</static>
+      <pose>6 6.125 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1.75 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1.75 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Y=8 a 9 (acima porta Q2) -->
+    <model name="wall_corr_right_4">
+      <static>true</static>
+      <pose>6 8.5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================ -->
+    <!--                    PAREDES DIVISORIAS                        -->
+    <!-- ============================================================ -->
+
+    <!-- Divisoria Sala / Quarto1 (Y=5, X=0 a 4.5) -->
+    <model name="wall_div_sala_q1">
+      <static>true</static>
+      <pose>2.25 5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>4.5 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>4.5 0.15 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Divisoria Cozinha / Banheiro - fundo do banheiro (Y=4, X=6 a 8.5) -->
+    <!-- Nota: so vai ate X=8.5, nao ate X=11 (Cozinha e L-shaped) -->
+    <model name="wall_div_coz_bath">
+      <static>true</static>
+      <pose>7.25 4 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>2.5 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>2.5 0.15 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================ -->
+    <!--                    PAREDES DO BANHEIRO                       -->
+    <!--          Banheiro: (6, 4) a (8.5, 5.5) = 2.5 x 1.5m        -->
+    <!-- ============================================================ -->
+
+    <!-- Topo do Banheiro (Y=5.5, X=6 a 8.5) -->
+    <model name="wall_bath_top">
+      <static>true</static>
+      <pose>7.25 5.5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>2.5 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>2.5 0.15 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Lateral direita do Banheiro (X=8.5, Y=4 a 5.5) -->
+    <model name="wall_bath_right">
+      <static>true</static>
+      <pose>8.5 4.75 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.15 1.5 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================ -->
+    <!--              DIVISORIA Q2 / COZINHA (Y=5.5, X=8.5 a 11)     -->
+    <!-- ============================================================ -->
+    <model name="wall_div_q2_coz">
+      <static>true</static>
+      <pose>9.75 5.5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>2.5 0.15 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>2.5 0.15 2.5</size></box></geometry>
+          <material><ambient>0.95 0.93 0.88 1</ambient><diffuse>0.95 0.93 0.88 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
