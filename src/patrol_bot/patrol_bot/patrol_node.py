@@ -19,6 +19,11 @@ class PatrolNode(Node):
         self.patrol_active = False
         self.rotation_in_progress = False
 
+        # Controle da missão:
+        # 0 -> ainda não bateu no obstáculo do lado oposto
+        # 1 -> já bateu no lado oposto, girou e está voltando
+        self.obstacle_count = 0
+
         # Lidar
         self.front_distance = float('inf')
         self.scan_received = False
@@ -60,6 +65,9 @@ class PatrolNode(Node):
         if request.data:
             if not self.patrol_active:
                 self.patrol_active = True
+                self.rotation_in_progress = False
+                self.obstacle_count = 0
+                self.last_motion_state = ''
                 response.success = True
                 response.message = 'Patrulha iniciada.'
                 self.get_logger().info('Serviço recebido: patrulha iniciada.')
@@ -68,9 +76,19 @@ class PatrolNode(Node):
                 response.message = 'Robô já está em operação.'
                 self.get_logger().info('Serviço recebido, mas o robô já está operando.')
         else:
-            response.success = False
-            response.message = 'Use data=true para iniciar a patrulha.'
-            self.get_logger().info('Serviço recebido com data=false.')
+            if self.patrol_active:
+                self.patrol_active = False
+                self.rotation_in_progress = False
+                self.obstacle_count = 0
+                self.stop_robot()
+                self.last_motion_state = ''
+                response.success = True
+                response.message = 'Patrulha parada.'
+                self.get_logger().info('Serviço recebido: patrulha parada.')
+            else:
+                response.success = False
+                response.message = 'O robô já está parado.'
+                self.get_logger().info('Serviço recebido com data=false, mas o robô já estava parado.')
 
         return response
 
@@ -102,11 +120,27 @@ class PatrolNode(Node):
 
         if self.front_distance < self.obstacle_threshold:
             self.stop_robot()
-            self.log_state('OBSTACLE_DETECTED')
-            self.send_rotate_goal(self.rotation_angle_degrees)
-        else:
-            self.move_forward()
-            self.log_state('MOVING_FORWARD')
+
+            # Primeiro obstáculo: chegou ao lado oposto, então gira e volta
+            if self.obstacle_count == 0:
+                self.obstacle_count = 1
+                self.log_state('OBSTACLE_DETECTED')
+                self.send_rotate_goal(self.rotation_angle_degrees)
+
+            # Segundo obstáculo: retornou ao lado inicial, então encerra
+            else:
+                self.patrol_active = False
+                self.rotation_in_progress = False
+                self.obstacle_count = 0
+                self.stop_robot()
+                self.get_logger().info(
+                    'Obstáculo detectado novamente. Robô retornou ao ponto inicial. Patrulha concluída.'
+                )
+                self.log_state('MISSION_COMPLETE')
+            return
+
+        self.move_forward()
+        self.log_state('MOVING_FORWARD')
 
     def move_forward(self):
         msg = Twist()
@@ -191,6 +225,8 @@ class PatrolNode(Node):
             self.get_logger().info(
                 f'Caminho livre ({self.front_distance:.2f} m). Andando para frente.'
             )
+        elif state_name == 'MISSION_COMPLETE':
+            self.get_logger().info('Estado: MISSION_COMPLETE. Patrulha encerrada com sucesso.')
 
         self.last_motion_state = state_name
 

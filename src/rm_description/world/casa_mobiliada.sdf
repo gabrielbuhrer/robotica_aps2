@@ -1435,42 +1435,42 @@
       <self_collide>false</self_collide>
     </model>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/dining table/1</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/dining%20table</uri>
       <name>DiningTable</name>
       <pose>1.4794166088104248 2.4838399887084961 0 0 0 0</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/armchair/2</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/armchair</uri>
       <name>Armchair</name>
       <pose>1.19992995262146 7.7400565147399902 0 0 0 0</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/sofa/3</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/sofa</uri>
       <name>Sofa</name>
       <pose>2.1417200565338135 6.1217298507690439 0 0 0 1.5949620637278894</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/bed/1</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/bed</uri>
       <name>Bed</name>
       <pose>8.9322347640991211 1.9534503221511841 0 0 0 -1.5533199989945032</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/tvstand/2</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/tvstand</uri>
       <name>TVStand</name>
       <pose>3.0719204274705723 8.214109509305322 0 0 0 0</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/fridge/2</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/fridge</uri>
       <name>Fridge</name>
       <pose>10.045499801635742 8.1017179489135742 0 0 0 0</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ladder_01/1</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/ladder_01</uri>
       <name>Ladder</name>
       <pose>7.3774842141169268 7.4664531771269154 0 0 0 0</pose>
     </include>
     <include>
-      <uri>file:///home/gabriel/.gz/fuel/fuel.gazebosim.org/openrobotics/models/pallet_jack/1</uri>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/pallet_jack</uri>
       <name>Pallet_Jack</name>
       <pose>3.1913101673126221 2.3922300338745117 0 0 0 0</pose>
     </include>
